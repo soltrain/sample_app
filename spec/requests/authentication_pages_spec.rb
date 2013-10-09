@@ -87,6 +87,7 @@ describe "Authentication" do
 		end
 
 		describe "as wrong user" do
+			#why do I need to call below line again if it's nested above?
 			let(:user) { FactoryGirl.create(:user) }
 			let(:wrong_user) {FactoryGirl.create(:user, email: "wronguser@test.com") }
 			before { sign_in user, no_capybara: true }
@@ -99,6 +100,18 @@ describe "Authentication" do
 
 			describe "submitting PATCH request to users#update action" do 
 				before { patch user_path(wrong_user) }
+				specify { expect(response).to redirect_to(root_url) }
+			end
+		end
+
+		describe "as non-admin user" do 
+			let(:user) { FactoryGirl.create(:user) }
+			let(:non_admin) { FactoryGirl.create(:user) }
+			#why using nocapybara here?
+			before { sign_in non_admin, no_capybara: true }
+
+			describe "submitting DELETE request directly to Users#destroy action" do 
+				before { delete user_path(user) }
 				specify { expect(response).to redirect_to(root_url) }
 			end
 		end
